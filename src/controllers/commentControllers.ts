@@ -29,7 +29,7 @@ export const addComment = async (req: AuthRequest, res: Response) => {
 
     const newComment = new Comment({
       pokemonId,
-      comment: `${user.name}: ${comment}`,
+      comment: `${user.name}: ${comment} `,
       user: req.user._id,
     });
 
@@ -72,19 +72,9 @@ export const longPollingComments = (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Pokemon ID is required' });
   }
 
-  console.log(`Long polling started for Pokémon ${pokemonId}`);
   clients.push({ pokemonId, res });
 
   req.on('close', () => {
-    clients = clients.filter((client) => client.res !== res);
-    console.log(`Connection closed for Pokémon ${pokemonId}`);
-  });
-
-  // Timeout to avoid keeping connections open indefinitely
-  setTimeout(() => {
-    clients = clients.filter((client) => client.res !== res);
-    res.status(204).end();
-    console.log(`Long polling timeout for Pokémon ${pokemonId}`);
-  }, 30000); // 30 seconds timeout
+    clients = clients.filter((client) => client.res !== res);
+  });
 };
-
